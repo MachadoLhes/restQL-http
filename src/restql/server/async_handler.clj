@@ -51,11 +51,16 @@
       (strip-nils
         (into {} {"cache-control" (str "max-age=" cache-control-value)})))))
 
+(defn define-max-age-header [response]
+  (println (pr-str response))
+  {"max-age" "50"})
+
 (defn make-headers [interpolated-query result]
   (->
     (resp/extract-alias-suffixed-headers result)
     (into {"Content-Type" "application/json"})
     (into (additional-headers interpolated-query))
+    (into (define-max-age-header result))
     (stringify-keys)))
 
 (defn handle-request [req result-ch error-ch]
