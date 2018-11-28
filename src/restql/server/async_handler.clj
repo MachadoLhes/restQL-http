@@ -7,6 +7,7 @@
             [restql.core.encoders.core :refer [base-encoders]]
             [clojure.tools.logging :as log]
             [restql.server.request-util :as util]
+            [restql.server.response-util :as response-util]
             [restql.server.database.core :as dbcore]
             [restql.server.cache :as cache]
             [restql.server.exception-handler :refer [wrap-exception-handling]]
@@ -51,16 +52,14 @@
       (strip-nils
         (into {} {"cache-control" (str "max-age=" cache-control-value)})))))
 
-(defn define-max-age-header [response]
-  (println (pr-str response))
-  {"max-age" "50"})
-
 (defn make-headers [interpolated-query result]
+  (println (str "" result))
+  ; (println (response-util/calculate-max-age result))
   (->
     (resp/extract-alias-suffixed-headers result)
+    ; (into {"max-age" (response-util/calculate-max-age result)})
     (into {"Content-Type" "application/json"})
     (into (additional-headers interpolated-query))
-    (into (define-max-age-header result))
     (stringify-keys)))
 
 (defn handle-request [req result-ch error-ch]
